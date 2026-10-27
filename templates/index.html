@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Sân Thể Thao Tích Hợp AI (Đề tài 36)</title>
+    <!-- Bootstrap 5 CSS & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+                <span class="fs-4 me-2">🏟️</span>
+                <span>SportSync <span class="badge bg-primary text-uppercase fs-7">AI RAG</span></span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-pills ms-lg-4" id="mainTab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active text-white" id="slots-tab" data-bs-toggle="pill" data-bs-target="#slots-pane">
+                            <i class="fa-solid fa-calendar-days me-1 text-info"></i> Sơ đồ Khung giờ
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link text-white" id="ai-chat-tab" data-bs-toggle="pill" data-bs-target="#ai-chat-pane">
+                            <i class="fa-solid fa-robot me-1 text-warning"></i> Trợ lý AI Tư vấn
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link text-white" id="bookings-tab" data-bs-toggle="pill" data-bs-target="#bookings-pane">
+                            <i class="fa-solid fa-receipt me-1 text-success"></i> Quản lý Đặt sân
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link text-white" id="reports-tab" data-bs-toggle="pill" data-bs-target="#reports-pane">
+                            <i class="fa-solid fa-chart-line me-1 text-primary"></i> Thống kê & Phân tích AI
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link text-white" id="maintenance-tab" data-bs-toggle="pill" data-bs-target="#maintenance-pane">
+                            <i class="fa-solid fa-wrench me-1 text-danger"></i> Quản lý Sân & Bảo trì
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span id="userBadge" class="badge bg-secondary py-2 px-3">
+                        <i class="fa-solid fa-user me-1"></i> Khách vãng lai
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" id="btnLoginModal" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
+                    </button>
+                    <button class="btn btn-danger btn-sm d-none" id="btnLogout">
+                        <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Đăng xuất
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container-fluid px-4 py-4">
+        <div class="tab-content" id="mainTabContent">
+            
+            <!-- TAB 1: SƠ ĐỒ KHUNG GIỜ -->
+            <div class="tab-pane fade show active" id="slots-pane">
+                <div class="row g-3 mb-4 align-items-center bg-white p-3 rounded-3 shadow-sm border">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold"><i class="fa-regular fa-calendar me-1"></i> Chọn ngày:</label>
+                        <input type="date" id="filterDate" class="form-control" value="2026-09-11">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold"><i class="fa-solid fa-filter me-1"></i> Loại sân:</label>
+                        <select id="filterCourtType" class="form-select">
+                            <option value="">-- Tất cả loại sân --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end justify-content-md-end gap-3 pt-2">
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <span class="badge bg-success"><i class="fa-solid fa-circle text-white me-1"></i> Trống (FREE)</span>
+                            <span class="badge bg-danger"><i class="fa-solid fa-lock text-white me-1"></i> Đã đặt (BOOKED)</span>
+                            <span class="badge bg-secondary"><i class="fa-solid fa-wrench text-white me-1"></i> Bảo trì (MAINTENANCE)</span>
+                        </div>
+                        <button class="btn btn-primary" id="btnReloadSlots">
+                            <i class="fa-solid fa-rotate me-1"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid hiển thị danh sách sân và khung giờ -->
+                <div id="slotsContainer" class="row g-4">
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 text-muted">Đang tải sơ đồ khung giờ...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: TRỢ LÝ AI RAG CHATBOT -->
+            <div class="tab-pane fade" id="ai-chat-pane">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-gradient bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0"><i class="fa-solid fa-robot me-2"></i> Trợ lý AI Tư vấn Đặt sân (Gemini 1.5 RAG)</h5>
+                                    <small class="text-white-50">Tư vấn thông minh dựa trên 100% dữ liệu CSDL thực tế - Chống ảo giác (Strict Grounding)</small>
+                                </div>
+                                <span class="badge bg-light text-primary">NFR-08 Fallback Ready</span>
+                            </div>
+                            
+                            <!-- Prompt Quick Suggestions -->
+                            <div class="p-3 bg-light border-bottom">
+                                <div class="d-flex align-items-center flex-wrap gap-2">
+                                    <span class="small fw-bold text-muted"><i class="fa-regular fa-lightbulb me-1"></i> Gợi ý nhanh:</span>
+                                    <button class="btn btn-sm btn-outline-secondary prompt-chip" data-prompt="Khách muốn đặt sân bóng 7 người tối thứ Sáu. Hãy gợi ý lựa chọn phù hợp.">
+                                        ⚽ Đặt sân bóng 7 tối thứ Sáu
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary prompt-chip" data-prompt="Chiều mai sân cầu lông còn khung giờ nào trống và giá bao nhiêu?">
+                                        🏸 Sân cầu lông chiều mai
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary prompt-chip" data-prompt="Tôi cần tìm sân tennis sáng nay cho 2 người tập luyện">
+                                        🎾 Sân Tennis sáng nay
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-4 chat-box-container" id="chatBox" style="height: 480px; overflow-y: auto;">
+                                <div class="chat-message bot mb-3">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <div class="avatar bg-primary text-white rounded-circle p-2 px-3">AI</div>
+                                        <div class="content bg-white p-3 rounded-3 shadow-sm border" style="max-width: 80%;">
+                                            <p class="mb-1">Xin chào! Em là Trợ lý AI của Hệ thống Quản lý Sân Thể Thao. Anh/chị đang cần tìm sân bóng đá, cầu lông hay tennis vào ngày nào và khung giờ nào để em tra cứu lịch trống ngay ạ?</p>
+                                            <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> Trực tuyến</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer bg-white p-3 border-top">
+                                <form id="chatForm" class="d-flex gap-2">
+                                    <input type="text" id="chatInput" class="form-control form-control-lg" placeholder="Nhập câu hỏi (Ví dụ: Tìm sân bóng 7 người tối thứ 6)..." required>
+                                    <button type="submit" class="btn btn-primary btn-lg px-4" id="btnSendChat">
+                                        <i class="fa-solid fa-paper-plane me-1"></i> Gửi
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: QUẢN LÝ ĐẶT SÂN & KHÁCH HÀNG -->
+            <div class="tab-pane fade" id="bookings-pane">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-list-check me-2 text-success"></i> Danh sách Lịch Đặt & Thanh toán Cọc</h5>
+                        <button class="btn btn-sm btn-outline-primary" id="btnReloadBookings">
+                            <i class="fa-solid fa-arrows-rotate me-1"></i> Tải lại danh sách
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="bookingsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mã đơn</th>
+                                        <th>Khách hàng</th>
+                                        <th>Sân & Loại sân</th>
+                                        <th>Ngày & Giờ</th>
+                                        <th>Tiền cọc (30-50%)</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookingsTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4 text-muted">Đang nạp dữ liệu đơn đặt sân...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: THỐNG KÊ & PHÂN TÍCH AI -->
+            <div class="tab-pane fade" id="reports-pane">
+                <!-- Summary Metrics Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-primary text-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white-50 mb-1">Tổng Doanh Thu Ước Tính</h6>
+                                    <h3 class="mb-0 fw-bold" id="metricTotalRevenue">0 đ</h3>
+                                </div>
+                                <i class="fa-solid fa-sack-dollar fs-1 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-success text-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white-50 mb-1">Tiền Cọc Đã Thu</h6>
+                                    <h3 class="mb-0 fw-bold" id="metricTotalDeposits">0 đ</h3>
+                                </div>
+                                <i class="fa-solid fa-money-bill-wave fs-1 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-warning text-dark p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-black-50 mb-1">Tổng Lượt Đặt Sân</h6>
+                                    <h3 class="mb-0 fw-bold" id="metricTotalBookings">0</h3>
+                                </div>
+                                <i class="fa-solid fa-calendar-check fs-1 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-info text-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white-50 mb-1">Công Suất Lấp Đầy Hôm Nay</h6>
+                                    <h3 class="mb-0 fw-bold" id="metricOccupancyRate">0%</h3>
+                                </div>
+                                <i class="fa-solid fa-chart-pie fs-1 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- Phân tích khung giờ cao điểm / thấp điểm -->
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-fire me-2 text-danger"></i> Phân Tích Khung Giờ Cao Điểm / Thấp Điểm</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Khung giờ</th>
+                                                <th>Đã đặt / Tổng</th>
+                                                <th>Tỷ lệ</th>
+                                                <th>Phân loại</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="peakHoursTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Tóm tắt công suất & Gợi ý khuyến mại -->
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-wand-magic-sparkles me-2 text-primary"></i> AI Phân Tích & Gợi Ý Khuyến Mại (FR-16)</h6>
+                                <button class="btn btn-sm btn-primary" id="btnRunAiReport">
+                                    <i class="fa-solid fa-bolt me-1"></i> Chạy phân tích AI
+                                </button>
+                            </div>
+                            <div class="card-body p-4" id="aiReportBox">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fa-solid fa-circle-info me-1"></i> Bấm nút <strong>"Chạy phân tích AI"</strong> để AI tổng hợp dữ liệu công suất thực tế và gợi ý chiến lược giảm giá cho các khung giờ thấp điểm.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: QUẢN LÝ SÂN & BẢO TRÌ -->
+            <div class="tab-pane fade" id="maintenance-pane">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-wrench me-2 text-danger"></i> Quản lý Trạng thái Sân & Lịch Bảo Trì (FR-06)</h5>
+                        <small class="text-muted">Khi chuyển trạng thái sân sang "Bảo trì", toàn bộ khung giờ còn trống trong tương lai sẽ tự động bị khóa</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên sân</th>
+                                        <th>Loại sân</th>
+                                        <th>Trạng thái hiện tại</th>
+                                        <th>Thao tác chuyển đổi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="maintenanceTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL: ĐẶT SÂN TẠI BÀN (Pessimistic Locking) -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-calendar-plus me-2"></i> Xác Nhận Đặt Sân</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="bookingForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="bookSlotId">
+                        <div class="p-3 bg-light rounded-3 mb-3 border">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Sân:</span>
+                                <span class="fw-bold" id="modalCourtName">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Thời gian:</span>
+                                <span class="fw-bold text-primary" id="modalTimeSlot">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Giá thuê:</span>
+                                <span class="fw-bold text-danger" id="modalSlotPrice">-</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Họ và tên khách hàng *</label>
+                            <input type="text" class="form-control" id="bookCustName" placeholder="Ví dụ: Nguyễn Văn A" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Số điện thoại *</label>
+                            <input type="tel" class="form-control" id="bookCustPhone" placeholder="Ví dụ: 0912345678" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tiền đặt cọc (Quy định 30% - 50%)</label>
+                            <input type="number" class="form-control" id="bookDeposit" step="10000" required>
+                            <small class="text-muted" id="depositSuggestion">Tối thiểu: 0 đ | Tối đa: 0 đ</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ghi chú thêm</label>
+                            <textarea class="form-control" id="bookNote" rows="2" placeholder="Yêu cầu thêm bóng, áo bib..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                        <button type="submit" class="btn btn-primary" id="btnConfirmBooking">
+                            <i class="fa-solid fa-lock me-1"></i> Khóa lịch & Xác nhận đặt
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AI SINH TIN NHẮN (FR-15) -->
+    <div class="modal fade" id="aiMessageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-robot me-2"></i> AI Soạn Tin Nhắn Thông Báo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group w-100 mb-3" role="group">
+                        <button type="button" class="btn btn-outline-success active" id="btnMsgConfirmation">Xác nhận đặt sân</button>
+                        <button type="button" class="btn btn-outline-success" id="btnMsgReminder">Nhắc lịch thi đấu</button>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nội dung tin nhắn (Tự động tạo bởi Gemini AI / Fallback):</label>
+                        <textarea class="form-control" id="generatedMsgText" rows="7"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success" id="btnCopyMsg">
+                        <i class="fa-regular fa-copy me-1"></i> Sao chép gửi khách
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ĐĂNG NHẬP -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-user-shield me-2"></i> Đăng Nhập</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="loginForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Tài khoản</label>
+                            <input type="text" id="loginUsername" class="form-control" placeholder="admin hoặc staff1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu</label>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="admin123 hoặc staff123" required>
+                        </div>
+                        <div class="d-flex gap-1 mb-2">
+                            <button type="button" class="btn btn-xs btn-outline-primary flex-fill" onclick="quickFillLogin('admin', 'admin123')">Admin mẫu</button>
+                            <button type="button" class="btn btn-xs btn-outline-secondary flex-fill" onclick="quickFillLogin('staff1', 'staff123')">Staff mẫu</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Thông báo -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast align-items-center text-white border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">Thông báo</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
+
