@@ -89,6 +89,40 @@ Sports_Facility_Management/
 └── requirements.txt             # Danh mục các thư viện phụ thuộc
 ```
 
+
+## 🤖 Quy trình phát triển tích hợp AI (AI-Assisted SDLC Workflow)
+
+Dưới đây là sơ đồ luồng làm việc phát triển phần mềm tích hợp trí tuệ nhân tạo theo chuẩn SDLC, bao gồm các mốc chính từ phân tích yêu cầu, thiết kế cơ sở dữ liệu, tích hợp 3 kỹ năng AI, kiểm thử tự động với cơ chế dự phòng, và ba điểm kiểm soát của con người trước khi triển khai.
+
+```mermaid
+flowchart TD
+    A([1. Phân tích yêu cầu<br/>Requirements Analysis]) --> B([2. Thiết kế CSDL<br/>Database Design])
+    B --> C([3. Tích hợp 3 AI Skill<br/>AI Integration])
+    C --> C1[🤖 Tư vấn khung giờ<br/>FR-14 • RAG Grounding]
+    C --> C2[🤖 Sinh tin nhắn thông báo<br/>FR-15 • SMS/Zalo]
+    C --> C3[🤖 Phân tích doanh thu<br/>FR-16 • Doanh thu & Khuyến mại]
+    C3 --> D([4. 12 Test Cases & Cơ chế Fallback<br/>Testing & Fallback])
+    D --> E([👤 Human Gate 1<br/>Xác thực yêu cầu & CSDL])
+    E --> F([👤 Human Gate 2<br/>Duyệt kết quả AI & Fallback])
+    F --> G([👤 Human Gate 3<br/>Duyệt kiểm thử & Triển khai])
+    G --> H([🚀 Hoàn thành & Triển khai<br/>Deployment])
+
+    style A fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style B fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style C fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style C1 fill:#fff3e0,stroke:#e65100,stroke-width:1px
+    style C2 fill:#fff3e0,stroke:#e65100,stroke-width:1px
+    style C3 fill:#fff3e0,stroke:#e65100,stroke-width:1px
+    style D fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    style E fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    style F fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    style G fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    style H fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+```
+
+> **Lưu ý:** Các điểm kiểm soát con người (Human Gate) đảm bảo việc can thiệp, duyệt và giám sát tại các mốc quan trọng trước khi hệ thống được đưa vào vận hành thực tế.
+
+---
 ---
 
 ## 🚀 Hướng Dẫn Cài Đặt & Khởi Chạy
