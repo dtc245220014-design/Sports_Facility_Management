@@ -123,7 +123,6 @@ flowchart TD
 > **Lưu ý:** Các điểm kiểm soát con người (Human Gate) đảm bảo việc can thiệp, duyệt và giám sát tại các mốc quan trọng trước khi hệ thống được đưa vào vận hành thực tế.
 
 ---
----
 
 ## 🚀 Hướng Dẫn Cài Đặt & Khởi Chạy
 
