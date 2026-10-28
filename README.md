@@ -92,35 +92,38 @@ Sports_Facility_Management/
 
 ## 🤖 Quy trình phát triển tích hợp AI (AI-Assisted SDLC Workflow)
 
-Dưới đây là sơ đồ luồng làm việc phát triển phần mềm tích hợp trí tuệ nhân tạo theo chuẩn SDLC, bao gồm các mốc chính từ phân tích yêu cầu, thiết kế cơ sở dữ liệu, tích hợp 3 kỹ năng AI, kiểm thử tự động với cơ chế dự phòng, và ba điểm kiểm soát của con người trước khi triển khai.
-
 ```mermaid
 flowchart TD
-    A([1. Phân tích yêu cầu<br/>Requirements Analysis]) --> B([2. Thiết kế CSDL<br/>Database Design])
-    B --> C([3. Tích hợp 3 AI Skill<br/>AI Integration])
-    C --> C1[🤖 Tư vấn khung giờ<br/>FR-14 • RAG Grounding]
-    C --> C2[🤖 Sinh tin nhắn thông báo<br/>FR-15 • SMS/Zalo]
-    C --> C3[🤖 Phân tích doanh thu<br/>FR-16 • Doanh thu & Khuyến mại]
-    C3 --> D([4. 12 Test Cases & Cơ chế Fallback<br/>Testing & Fallback])
-    D --> E([👤 Human Gate 1<br/>Xác thực yêu cầu & CSDL])
-    E --> F([👤 Human Gate 2<br/>Duyệt kết quả AI & Fallback])
-    F --> G([👤 Human Gate 3<br/>Duyệt kiểm thử & Triển khai])
-    G --> H([🚀 Hoàn thành & Triển khai<br/>Deployment])
+    A([📥 1. Phân tích yêu cầu & Khảo sát nghiệp vụ FR/NFR]) --> B[💻 2. Thiết kế hệ thống, ERD CSDL & API SQL & UML]
+    
+    B --> HG1{👤 Human Gate 1: Duyệt yêu cầu & Bản thiết kế}
+    
+    HG1 -- Đạt --> C[🤖 3. Tích hợp AI Agent & LLM Engine]
+    HG1 -- Chưa đạt --> A
+    
+    subgraph AI_Skills [Bộ 3 AI Skills & Bảo mật]
+        C --> D1[🤖 AI Trợ lý Tư vấn: Khung giờ trống FR-14 & Cơ chế RAG CSDL thực tế RAG Grounding]
+        C --> D2[🤖 AI Trợ lý Sinh tin nhắn: Xác nhận đặt sân & Nhắc lịch thi đấu FR-15 - SMS/Zalo]
+        C --> D3[🤖 AI Phân tích Kinh doanh: Doanh thu, Công suất & Đề xuất giá FR-16 - Admin Assist]
+    end
 
-    style A fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    style B fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    style C fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    style C1 fill:#fff3e0,stroke:#e65100,stroke-width:1px
-    style C2 fill:#fff3e0,stroke:#e65100,stroke-width:1px
-    style C3 fill:#fff3e0,stroke:#e65100,stroke-width:1px
-    style D fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
-    style E fill:#fce4ec,stroke:#880e4f,stroke-width:2px
-    style F fill:#fce4ec,stroke:#880e4f,stroke-width:2px
-    style G fill:#fce4ec,stroke:#880e4f,stroke-width:2px
-    style H fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    D1 & D2 & D3 --> HG2{👤 Human Gate 2: Rà soát & Tối ưu Prompt, Bảo mật dữ liệu Anonymizer Module}
+    
+    HG2 -- Đạt --> E[🧪 4. Thực nghiệm, 12 Test Cases & Xây dựng Fallback Mechanism Testing]
+    HG2 -- Chưa đạt --> C
+    
+    E --> HG3{👤 Human Gate 3: Thẩm định kiểm thử, Biên & Concurrency}
+    
+    HG3 -- Đạt --> F[📝 5. Hoàn thiện sản phẩm, Tài liệu kỹ thuật, README & Git]
+    HG3 -- Chưa đạt --> E
+    
+    F --> G[🚀 6. Triển khai hệ thống Web, Docker & Vận hành thực tế]
+    
+    G --> HG4{👤 Human Gate 4: Nghiệm thu & Hội đồng đánh giá}
+    
+    HG4 -- Đạt --> H([🎯 Hoàn thành, Vận hành & Phát triển tương lai])
+    HG4 -- Chưa đạt --> F
 ```
-
-> **Lưu ý:** Các điểm kiểm soát con người (Human Gate) đảm bảo việc can thiệp, duyệt và giám sát tại các mốc quan trọng trước khi hệ thống được đưa vào vận hành thực tế.
 
 ---
 
